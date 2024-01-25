@@ -2,26 +2,27 @@ import React from 'https://esm.sh/react@18.2.0';
 import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
 
 const calcData = [
-{ id: 'clear', value: 'AC' },
-{ id: 'divide', value: '/' },
-{ id: 'multiply', value: 'x' },
-{ id: 'seven', value: 7 },
-{ id: 'eight', value: 8 },
-{ id: 'nine', value: 9 },
-{ id: 'subtract', value: '-' },
-{ id: 'four', value: 4 },
-{ id: 'five', value: 5 },
-{ id: 'six', value: 6 },
-{ id: 'add', value: '+' },
-{ id: 'one', value: 1 },
-{ id: 'two', value: 2 },
-{ id: 'three', value: 3 },
-{ id: 'equals', value: '=' },
-{ id: 'zero', value: 0 },
-{ id: 'decimal', value: '.' }];
+  { id: 'clear', value: 'AC' },
+  { id: 'divide', value: '/' },
+  { id: 'multiply', value: 'x' },
+  { id: 'seven', value: 7 },
+  { id: 'eight', value: 8 },
+  { id: 'nine', value: 9 },
+  { id: 'subtract', value: '-' },
+  { id: 'four', value: 4 },
+  { id: 'five', value: 5 },
+  { id: 'six', value: 6 },
+  { id: 'add', value: '+' },
+  { id: 'one', value: 1 },
+  { id: 'two', value: 2 },
+  { id: 'three', value: 3 },
+  { id: 'equals', value: '=' },
+  { id: 'zero', value: 0 },
+  { id: 'decimal', value: '.' }
+];
 
 
-const operators = ['AC', '/', 'x', '+', '-', '='];
+const mathSymbols = ['AC', '/', 'x', '+', '-', '='];
 
 const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -29,6 +30,7 @@ const Display = ({ input, output }) => {
   return(
     React.createElement("div", { className: "output" },
     React.createElement("span", { className: "result" }, output),
+    React.createElement("hr", { className: "hrules" }),
     React.createElement("span", { id: "display", className: "input" }, input)));
 
 };
@@ -41,7 +43,7 @@ const Key = ({ keyData: { id, value }, handleInput }) => {
 };
 
 const Keyboard = ({ handleInput }) => {
-  return /*#__PURE__*/(
+  return(
     React.createElement("div", { className: "keys" },
     calcData.map((key) =>
     React.createElement(Key, { key: key.id, keyData: key, handleInput: handleInput }))));
@@ -76,7 +78,7 @@ const App = () => {
         setCalculator(`${calculator}`);
       } else {
         const lastChat = calculator.charAt(calculator.length - 1);
-        const isLast = lastChat === '*' || operators.includes(lastChat);
+        const isLast = lastChat === '*' || mathSymbols.includes(lastChat);
 
         setInput(isLast ? `${value}` : `${input}${value}`);
         setCalculator(`${calculator}${value}`);
@@ -90,7 +92,7 @@ const App = () => {
       setCalculator('0.');
     } else
     {
-      if (lastChat === '*' || operators.includes(lastChat)) {
+      if (lastChat === '*' || mathSymbols.includes(lastChat)) {
         setInput('0.');
         setCalculator(`${calculator} 0.`);
       } else {
@@ -104,16 +106,16 @@ const App = () => {
   };
 
 
-  const handleOp = value => {
+  const handleOperator = value => {
     if (calculator.length) {
       setInput(`${value}`);
       const beforeLastChat = calculator.charAt(calculator.length - 2);
 
-      const beforeLastChatOp = operators.includes(beforeLastChat) || beforeLastChat === '*';
+      const beforeLastChatOp = mathSymbols.includes(beforeLastChat) || beforeLastChat === '*';
 
       const lastChat = calculator.charAt(calculator.length - 1);
 
-      const lastChatIsOp = operators.includes(lastChat) || lastChat === '*';
+      const lastChatIsOp = mathSymbols.includes(lastChat) || lastChat === '*';
 
       const validOp = value === 'x' ? '*' : value;
       if (
@@ -132,7 +134,7 @@ const App = () => {
 
   const handleInput = value => {
     const number = numbers.find(num => num === value);
-    const operator = operators.find(op => op === value);
+    const operator = mathSymbols.find(op => op === value);
 
     switch (value) {
       case '=':
@@ -148,10 +150,11 @@ const App = () => {
         dotOperator();
         break;
       case operator:
-        handleOp(value);
+        handleOperator(value);
         break;
       default:
-        break;}
+        break;
+      }
   };
 
 
