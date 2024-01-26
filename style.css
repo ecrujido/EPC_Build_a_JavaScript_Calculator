@@ -7,7 +7,8 @@
 :root {
   --green-color: green;
   --white-color: white;
-  --gray-color: rgb(120, 120, 120);
+  --gray-color: rgb(70, 70, 70);
+  --black-color: black;
   --light-white-color: rgb(230, 230, 230);
   --lightest-white-color: rgb(200, 200, 200);
 }
@@ -26,10 +27,11 @@
   display: flex; 
   align-items: center; 
   justify-content: center;
+  background-color: var(--black-color);
 }
 
 .calculator { 
-  height: 455px ;
+  height: 470px ;
   max-width: 460px ; 
   border-radius: 4px ; 
   background-color: var(--gray-color) ;
@@ -64,6 +66,14 @@ button:hover {
 
 hr {
   border: 2px solid var(--green-color);
+}
+
+
+footer {
+  text-align: left;
+  padding-top: 10px;
+  padding-left: 10px;
+  color: var(--light-white-color);
 }
 
 

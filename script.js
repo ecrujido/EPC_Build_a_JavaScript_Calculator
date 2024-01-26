@@ -1,7 +1,8 @@
 import React from 'https://esm.sh/react@18.2.0';
 import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
 
-const calcData = [
+
+const calculatorElement = [
   { id: 'clear', value: 'AC' },
   { id: 'divide', value: '/' },
   { id: 'multiply', value: 'x' },
@@ -31,133 +32,146 @@ const Display = ({ input, output }) => {
     React.createElement("div", { className: "output" },
     React.createElement("span", { className: "result" }, output),
     React.createElement("hr", { className: "hrules" }),
-    React.createElement("span", { id: "display", className: "input" }, input)));
-
+    React.createElement("span", { id: "display", className: "input" }, input),
+    React.createElement("footer", { className: "footer" }, "Javascript Calculator " + String.fromCharCode(169) +  " 2024")
+    ));
 };
 
-const Key = ({ keyData: { id, value }, handleInput }) => {
+
+const Key = ({ keyData: { id, value }, evaluateInput }) => {
   return(
-    React.createElement("button", { id: id, onClick: () => handleInput(value) },
+    React.createElement("button", { id: id, onClick: () => evaluateInput(value) },
     value));
-
 };
 
-const Keyboard = ({ handleInput }) => {
+
+const Keyboard = ({ evaluateInput }) => {
   return(
     React.createElement("div", { className: "keys" },
-    calcData.map((key) =>
-    React.createElement(Key, { key: key.id, keyData: key, handleInput: handleInput }))));
-
+    calculatorElement.map((key) =>
+    React.createElement(Key, { key: key.id, keyData: key, evaluateInput: evaluateInput }))));
 };
 
 
 const App = () => {
-
   const [input, setInput] = React.useState('0');
   const [output, setOutput] = React.useState('');
   const [calculator, setCalculator] = React.useState('');
 
-  const handleSubmit = () => {
-    const total = eval(calculator);
-    setInput(total);
-    setOutput(`${total} = ${total}`);
-    setCalculator(`${total}`);
-  };
 
-  const handleClear = () => {
+  const submitNumber = () => {
+    try {
+      const total = eval(calculator);
+      setInput(total);
+      setOutput(`${total} = ${total}`);
+      setCalculator(`${total}`);
+    } catch (error) {
+        alert('Error evaluating expression:', error);
+    }
+  };
+  
+
+  const clearInput = () => {
     setInput('0');
     setCalculator('');
   };
 
-  const handleNum = value => {
+
+  const validateNumericInput = (value) => {
     if (!calculator.length) {
       setInput(`${value}`);
       setCalculator(`${value}`);
     } else {
-      if (value === 0 && (calculator === '0' || input === '0')) {
+      const lastChar = calculator.charAt(calculator.length - 1);
+      const isLastOperator = lastChar === '*' || mathSymbols.includes(lastChar);
+      const isValueZero = value === 0 && (calculator === '0' || input === '0');
+  
+      if (isValueZero) {
         setCalculator(`${calculator}`);
       } else {
-        const lastChat = calculator.charAt(calculator.length - 1);
-        const isLast = lastChat === '*' || mathSymbols.includes(lastChat);
-
-        setInput(isLast ? `${value}` : `${input}${value}`);
-        setCalculator(`${calculator}${value}`);
-      }}
+        const newInput = isLastOperator ? `${value}` : `${input}${value}`;
+        setInput(newInput);
+  
+        const newCalculator = `${calculator}${value}`;
+        setCalculator(newCalculator);
+      }
+    }
   };
+  
 
   const dotOperator = () => {
-    const lastChat = calculator.charAt(calculator.length - 1);
+    const lastChar = calculator.charAt(calculator.length - 1);
+  
     if (!calculator.length) {
       setInput('0.');
       setCalculator('0.');
-    } else
-    {
-      if (lastChat === '*' || mathSymbols.includes(lastChat)) {
+    } else {
+      if (lastChar === '*' || mathSymbols.includes(lastChar)) {
         setInput('0.');
         setCalculator(`${calculator} 0.`);
       } else {
-        setInput(
-        lastChat === '.' || input.includes('.') ? `${input}` : `${input}.`);
-
-        const formattedValue = lastChat === '.' || input.includes('.') ? `${calculator}` : `${calculator}.`;
+        const newInput = lastChar === '.' || input.includes('.') ? `${input}` : `${input}.`;
+        setInput(newInput);
+  
+        const formattedValue = lastChar === '.' || input.includes('.') ? `${calculator}` : `${calculator}.`;
         setCalculator(formattedValue);
       }
     }
   };
+  
 
-
-  const handleOperator = value => {
-    if (calculator.length) {
+  const mathOperation = (value) => {
+    if (calculator.length === 0) {
       setInput(`${value}`);
-      const beforeLastChat = calculator.charAt(calculator.length - 2);
+      return;
+    }
+  
+    const beforeLastChar = calculator.charAt(calculator.length - 2);
+    const beforeLastCharOp = mathSymbols.includes(beforeLastChar) || beforeLastChar === '*';
+  
+    const lastChar = calculator.charAt(calculator.length - 1);
+    const lastCharIsOp = mathSymbols.includes(lastChar) || lastChar === '*';
+    const validOp = value === 'x' ? '*' : value;
+  
+    if ((lastCharIsOp && value !== '-') || (beforeLastCharOp && lastCharIsOp)) {
+      const updateValue = beforeLastCharOp
+        ? `${calculator.substring(0, calculator.length - 2)}${value}`
+        : `${calculator.substring(0, calculator.length - 1)}${validOp}`;
+  
+      setCalculator(updateValue);
+    } else {
+      setCalculator(`${calculator}${validOp}`);
+    }
+  };
+  
 
-      const beforeLastChatOp = mathSymbols.includes(beforeLastChat) || beforeLastChat === '*';
-
-      const lastChat = calculator.charAt(calculator.length - 1);
-
-      const lastChatIsOp = mathSymbols.includes(lastChat) || lastChat === '*';
-
-      const validOp = value === 'x' ? '*' : value;
-      if (
-      lastChatIsOp && value !== '-' || beforeLastChatOp && lastChatIsOp)
-      {
-        if (beforeLastChatOp) {
-          const updateValue = `${calculator.substring(0,
-          calculator.length - 2)}${value}`;
-          setCalculator(updateValue);} else {
-          setCalculator(`${calculator.substring(0, calculator.length - 1)}${validOp}`);}
-      } else {
-        setCalculator(`${calculator}${validOp}`);
-      }
-    }};
-
-
-  const handleInput = value => {
+  const evaluateInput = value => {
+    
     const number = numbers.find(num => num === value);
     const operator = mathSymbols.find(op => op === value);
 
     switch (value) {
       case '=':
-        handleSubmit();
+        submitNumber();
         break;
       case 'AC':
-        handleClear();
+        clearInput();
         break;
       case number:
-        handleNum(value);
+        validateNumericInput(value);
         break;
       case '.':
         dotOperator();
         break;
       case operator:
-        handleOperator(value);
+        mathOperation(value);
         break;
       default:
         break;
       }
   };
 
-
+ 
   const handleOutput = () => {setOutput(calculator);};
 
   React.useEffect(() => {handleOutput();}, [calculator]);
@@ -169,8 +183,9 @@ const App = () => {
       output: output 
     }),
     React.createElement(Keyboard,
-      { handleInput: handleInput 
+      { evaluateInput: evaluateInput 
     }))));
 };
+
 
 ReactDOM.render(React.createElement(App, null), document.getElementById('app'));
